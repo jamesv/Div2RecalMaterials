@@ -20,10 +20,11 @@ key_map = {
     'options': 18       # o
 }
 
-key_press_default = 300
+key_press_short = 250
+key_press_default = 500
 key_press_long = 2000
 key_press_v_long = 4000
-key_dwell_default = 700
+key_dwell_default = 1000
 key_dwell_long = 2000
 
 key_queue = []
@@ -36,6 +37,8 @@ def KeyPress(keys, press_length='default', dwell_length='default'):
         press_duration = key_press_v_long
     elif press_length == 'long':
         press_duration = key_press_long
+    elif press_length == 'short':
+        press_duration = key_press_short
     else:
         press_duration = key_press_default
 
@@ -53,17 +56,19 @@ def EnterInventory():
 
 def ExitInventory():
     LogStep("Exit Inventory")
-    KeyPress('circle circle')
+    KeyPress('circle circle', press_length='short')
 
 def EnterSHDMenu():
     LogStep("Enter SHD Menu")
     EnterInventory()
-    KeyPress('down down down down down right right X')
-    KeyPress('down right X')
+    KeyPress('down down down down down right right', press_length='short')
+    KeyPress('X')
+    KeyPress('down right', press_length='short')
+    KeyPress('X')
 
 def ExitSHDMenu():
     LogStep("Exit SHD Menu")
-    KeyPress('circle circle')
+    KeyPress('circle circle', press_length='short')
     ExitInventory()
 
 def EnterShopMenu():
@@ -72,7 +77,40 @@ def EnterShopMenu():
 
 def ExitShopMenu():
     LogStep("Exit Shop Menu")
-    KeyPress('circle')
+    KeyPress('circle', press_length='short')
+
+
+def ScavengeMaterials(materials):
+    EnterSHDMenu()
+    for material in materials:
+        thrown_error = False
+
+        if material[0] == "credits":
+            KeyPress('') # Correct position
+        elif material[0] == "shd":
+            KeyPress('down down down down down down down down', press_length='short')
+        elif material[0] == "field":
+            KeyPress('down down down down down down down down down', press_length='short')
+        else:
+            thrown_error = "INVALID TYPE"
+
+        try:
+            material_item_qty = int(material[1])
+        except:
+            thrown_error = "INVALID QTY"
+
+        if not thrown_error:
+            LogStep("Buying %s - %s" % (material[0], material[1]))
+            for x in range(material_item_qty):
+                KeyPress('X', press_length='long')
+        else:
+            LogStep(thrown_error)
+
+        # Soft Reset SHDMenu
+        KeyPress('circle', press_length='short')
+        KeyPress('X')
+
+    ExitSHDMenu()
 
 def WriteReport(report):
     with open('/dev/hidg0', 'rb+') as fd:
@@ -92,4 +130,5 @@ def ProcessQueue(key_queue):
             sleep(float(k[3])/1000)
 
         elif k[0] == "log":
+            print "\n"
             print k[1]
