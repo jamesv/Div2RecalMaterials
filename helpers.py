@@ -1,4 +1,7 @@
-from time import sleep
+from time import sleep, time
+import datetime
+
+start_time = time()
 
 NULL_CHAR = chr(0)
 
@@ -11,7 +14,11 @@ key_map = {
     'down': 7,          # d
     'left': 15,         # l
     'right': 21,        # r
+    'L1': 30,           # 1
     'L2': 31,           # 2
+    'L3': 32,           # 3
+    'R1': 20,           # q
+    'R2': 26,           # w
     'R3': 8,            # e
     'arrowl': 80,
     'arrowr': 79,
@@ -79,6 +86,16 @@ def ExitShopMenu():
     LogStep("Exit Shop Menu")
     KeyPress('circle', press_length='short')
 
+def EnterFactionMenu():
+    LogStep("Enter Faction Menu")
+    KeyPress('square', press_length='long')
+    KeyPress('down down down down X')
+    KeyPress('R2 down down down R2')
+
+def ExitFactionMenu():
+    LogStep("Exit Shop Menu")
+    KeyPress('circle circle circle', press_length='short')
+
 
 def ScavengeMaterials(materials):
     EnterSHDMenu()
@@ -87,6 +104,20 @@ def ScavengeMaterials(materials):
 
         if material[0] == "credits":
             KeyPress('') # Correct position
+        elif material[0] == "ceramics":
+            KeyPress('down', press_length='short')
+        elif material[0] == "polycarbonate":
+            KeyPress('down down', press_length='short')
+        elif material[0] == "steel":
+            KeyPress('down down down', press_length='short')
+        elif material[0] == "carbon":
+            KeyPress('down down down down', press_length='short')
+        elif material[0] == "electronics":
+            KeyPress('down down down down down', press_length='short')
+        elif material[0] == "titanium":
+            KeyPress('down down down down down down', press_length='short')
+        elif material[0] == "filament":
+            KeyPress('down down down down down down down', press_length='short')
         elif material[0] == "shd":
             KeyPress('down down down down down down down down', press_length='short')
         elif material[0] == "field":
@@ -113,8 +144,9 @@ def ScavengeMaterials(materials):
     ExitSHDMenu()
 
 def WriteReport(report):
-    with open('/dev/hidg0', 'rb+') as fd:
-        fd.write(report.encode())
+    True
+    # with open('/dev/hidg0', 'rb+') as fd:
+    #     fd.write(report.encode())
 
 def ProcessQueue(key_queue):
     # Press those buttons
@@ -132,3 +164,5 @@ def ProcessQueue(key_queue):
         elif k[0] == "log":
             print "\n"
             print k[1]
+
+    print "Runtime:", str(datetime.timedelta(seconds=(int(time() - start_time))))
